@@ -1,0 +1,55 @@
+{
+  "name": "plaintext-song-parser",
+  "version": "1.0.0",
+  "description": "Allows you to parse plaintext lyrics file contents into a Javascript object",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "main": "./dist/cjs/index.js",
+      "module": "./dist/esm/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "prepublishOnly": "npm run build",
+    "test": "jest"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Miniontoby/plaintext-song-parser.js.git"
+  },
+  "keywords": [
+    "songtext",
+    "parser",
+    "plaintext"
+  ],
+  "author": "Miniontoby",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Miniontoby/plaintext-song-parser.js/issues"
+  },
+  "homepage": "https://github.com/Miniontoby/plaintext-song-parser.js#readme",
+  "devDependencies": {
+    "@babel/core": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.18.0",
+    "rollup-plugin-dts": "^6.1.1",
+    "tslib": "^2.6.2",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "jest": "^29.7.0"
+  }
+}
