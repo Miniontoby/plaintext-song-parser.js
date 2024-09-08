@@ -61,11 +61,17 @@ console.log(song.couplets);
 - `Song.couplets: string[][]`
   Returns the same as `Song.coupletsWithReferences`, but the references are replaced by the lyrics connected to that reference.
   This is the recommended property to use.
+- `Song.modifiers: {any}`
+  Returns the modifiers that had been detected, such as title
 - `static Song.getTitleFromText(content: string[]|string)`
   Returns the title from the text
-  This will be parsed from the first line of the `content` if it starts with `#`
+  This will just run `static Song.getModifiersFromText(content)` and then return the `.title` field or `null`
   If no title can be found, it will return `null`, so if you always need an string, just add `?? ''` after the method...
-
+- `static Song.getModifiersFromText(content: string[]|string)`
+  Returns the modifiers from the text
+  This will be parsed from the first lines of the `content` if it starts with `#`
+  If no comments can be found, it will return `{}`.
+  This is the place where you would find the title.
 
 ## Song format
 

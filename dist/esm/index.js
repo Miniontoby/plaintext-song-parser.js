@@ -5,6 +5,7 @@ class Song {
         this.title = null;
         this.couplets = [];
         this.coupletsWithReferences = [];
+        this.modifiers = {};
         if (identifier) {
             this.identifier = Number(identifier);
             if (isNaN(this.identifier))
@@ -19,8 +20,9 @@ class Song {
         if (title && title !== '')
             this.title = title;
         if (this.content) {
-            if (this.title === null)
-                this.title = Song.getTitleFromText(this.getLines(true));
+            this.modifiers = Song.getModifiersFromText(this.getLines(true));
+            if (this.title === null && this.modifiers?.title)
+                this.title = this.modifiers.title;
             this.process();
         }
     }
@@ -33,7 +35,7 @@ class Song {
             return null;
         const firstNonCommentIndex = allLines.findIndex(line => !line.startsWith('#'));
         if (returnComments)
-            return allLines.slice(0, firstNonCommentIndex);
+            return allLines.slice(0, firstNonCommentIndex > -1 ? firstNonCommentIndex : undefined); // +1 cause this is exclusive of the element at the index 'end'
         else
             return allLines.slice(firstNonCommentIndex);
     }
@@ -81,14 +83,34 @@ class Song {
         this.couplets = paragraphs;
     }
     static getTitleFromText(content) {
+        const modifiers = Song.getModifiersFromText(content);
+        return modifiers?.title ?? null;
+    }
+    static getModifiersFromText(content) {
         const lines = (typeof (content) == 'string') ? content.split(/\r?\n/) : content;
-        // Assuming it is on the first line after an `# ` or `#` -> `# This is the title` or `#This is the title`
-        if (lines && lines.length > 0 && lines[0].startsWith('#')) {
-            if (lines[0].startsWith('# '))
-                return lines[0].substring(2);
-            return lines[0].substring(1);
+        if (lines === null || lines === undefined)
+            return {};
+        const firstNonCommentIndex = lines?.findIndex(line => !line.startsWith('#'));
+        const comments = lines.slice(0, firstNonCommentIndex > -1 ? firstNonCommentIndex : undefined);
+        const modifiers = {};
+        for (let comment of comments) {
+            comment = comment.replace(/^#\s*/, ''); // Remove comment prefix
+            const regex = /^([\w]+)\s*=\s*(.*)$/;
+            const m = regex.exec(comment);
+            if (m) {
+                modifiers[m[1]] = m[2];
+                if (m[2] === 'true')
+                    modifiers[m[1]] = true;
+                else if (m[2] === 'false')
+                    modifiers[m[1]] = false;
+                else if (!isNaN(Number(m[2])))
+                    modifiers[m[1]] = Number(m[2]);
+            }
+            else if (!comment.includes('=')) {
+                modifiers['title'] = comment;
+            }
         }
-        return null;
+        return modifiers;
     }
 }
 

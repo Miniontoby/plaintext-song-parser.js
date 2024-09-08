@@ -8,6 +8,7 @@ test('creating a new Song class should result into default values', () => {
 		title: null,
 		couplets: [],
 		coupletsWithReferences: [],
+		modifiers: {},
 	});
 });
 
@@ -40,12 +41,15 @@ test('the getTitleFromText should works as it supposed to work', () => {
 	lyricses.push(lyricses[1].join('\r\n'));
 
 	expect(Song.getTitleFromText()).toBe(null);
-	for (const lyrics of lyricses)
+	expect(Song.getModifiersFromText()).toEqual({});
+	for (const lyrics of lyricses) {
 		expect(Song.getTitleFromText(lyrics)).toBe(titleValue);
+		expect(Song.getModifiersFromText(lyrics)?.title).toBe(titleValue);
+	}
 });
 
 
-const lyrics = "# Put your title on the first line after an '#'\nHere is the first line of your song\nAnd here is the second line\n\nThis is a new paragraph\nand this line belongs to it\n\nIf you have paragraphs that\nneed to be split up, just add a\n[split]\nand this paragraph will\nbelong to the same couplet\n\nRefrain:\n^^ this will create a reference\nthat this paragraph is named 'Refrain'\nIt may not include spaces!\n[split]\nYou can also split these up\ninto multiple parts\n[split]\nAnd you would name them if you want\nto reuse these lines of the song later.\nIf you want to sing this again, just add\n\n(Refrain)\n\nand if you need to repeat\nthat paragraph more than once\njust add the amount and an x\nafter the name of the reference\n\n(Refrain 2x)";
+const lyrics = "# Put your title on the first line after an '#'\n# multilang=false\n# lines = 4\n#Wowie = Hello\nHere is the first line of your song\nAnd here is the second line\n\nThis is a new paragraph\nand this line belongs to it\n\nIf you have paragraphs that\nneed to be split up, just add a\n[split]\nand this paragraph will\nbelong to the same couplet\n\nRefrain:\n^^ this will create a reference\nthat this paragraph is named 'Refrain'\nIt may not include spaces!\n[split]\nYou can also split these up\ninto multiple parts\n[split]\nAnd you would name them if you want\nto reuse these lines of the song later.\nIf you want to sing this again, just add\n\n(Refrain)\n\nand if you need to repeat\nthat paragraph more than once\njust add the amount and an x\nafter the name of the reference\n\n(Refrain 2x)";
 test('parsing a song content should set the coupletsWithReferences to the correct content', () => {
 	const song = new Song(lyrics);
 	expect(JSON.stringify(song.coupletsWithReferences)).toBe(
@@ -73,5 +77,18 @@ test('parsing a song content should set the couplets to the correct content', ()
 			["and if you need to repeat\nthat paragraph more than once\njust add the amount and an x\nafter the name of the reference"],
 			["^^ this will create a reference\nthat this paragraph is named 'Refrain'\nIt may not include spaces!\n","You can also split these up\ninto multiple parts\n","And you would name them if you want\nto reuse these lines of the song later.\nIf you want to sing this again, just add","^^ this will create a reference\nthat this paragraph is named 'Refrain'\nIt may not include spaces!\n","You can also split these up\ninto multiple parts\n","And you would name them if you want\nto reuse these lines of the song later.\nIf you want to sing this again, just add"]
 		])
+	);
+});
+
+
+test('parsing a song content should set the modifiers to the correct values', () => {
+	const song = new Song(lyrics);
+	expect(JSON.stringify(song.modifiers)).toBe(
+		JSON.stringify({
+			title: "Put your title on the first line after an '#'",
+			multilang: false,
+			lines: 4,
+			Wowie: 'Hello'
+		})
 	);
 });
